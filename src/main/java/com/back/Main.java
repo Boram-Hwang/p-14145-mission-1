@@ -9,14 +9,14 @@ public class Main {
         System.out.println("== 명언 앱 ==");
         Scanner scanner = new Scanner(System.in);
 
+        List<WiseSaying> wiseSayings = new ArrayList<>();
+
         int lastId = 0;
-        WiseSaying[] wiseSayings = new WiseSaying[100];
         int wiseSayingLastIndex = -1;
 
         while(true) {
             System.out.print("명령) ");
             String cmd = scanner.nextLine();
-
 
             if(cmd.equals("종료")) {
                 break;
@@ -33,15 +33,15 @@ public class Main {
                 wiseSaying.content = wiseSayingContent;
                 wiseSaying.author = wiseSayingAuthor;
 
-                wiseSayings[++wiseSayingLastIndex] = wiseSaying;
+                wiseSayings.add(wiseSaying);
 
                 System.out.println("%d번 명언이 등록되었습니다.".formatted(id));
             } else if (cmd.equals("목록")) {
                 System.out.println("번호 / 작가 / 명언");
                 System.out.println("-----------------");
 
-                for(int i = wiseSayingLastIndex; i >= 0; i--) {
-                    WiseSaying wiseSaying = wiseSayings[i];
+                for(int i = wiseSayings.size() - 1; i >= 0; i--) {
+                    WiseSaying wiseSaying = wiseSayings.get(i);
 
                     if(wiseSaying == null) continue;
 
@@ -60,8 +60,8 @@ public class Main {
                 int index = Integer.parseInt(cmdBites[1]);
 
                 // id가 같은 명언을 찾기
-                for(int i = 0; i <=wiseSayingLastIndex; i++) {
-                    if(wiseSayings[i].id == index) {
+                for(int i = 0; i <=wiseSayings.size() - 1; i++) {
+                    if(wiseSayings.get(i).id == index) {
                         deleteIndex = i;
                         break;
                     }
@@ -73,12 +73,9 @@ public class Main {
                     continue;
                 }
 
-                for(int i = index; i <= wiseSayingLastIndex; i++) {
-                    wiseSayings[i-1] = wiseSayings[i]; // i-1번 값에 i값 넣기
-                }
+                // 삭제
+                wiseSayings.remove(deleteIndex);
 
-                wiseSayings[wiseSayingLastIndex] = null; // 제일 마지막 배열은 null값 넣기
-                wiseSayingLastIndex--; // 명언 마지막 index는 -1 해야함
                 System.out.printf("%d번 명언이 삭제되었습니다.\n".formatted(index));
             } else if (cmd.startsWith("수정")) {
                 String[] cmdBites = cmd.split("=", 2);
@@ -93,8 +90,8 @@ public class Main {
                 int id = Integer.parseInt(cmdBites[1]);
 
                 // id 찾기
-                for(int i = 0; i <= wiseSayingLastIndex; i++) {
-                    if(wiseSayings[i].id == id) {
+                for(int i = 0; i <= wiseSayings.size() - 1; i++) {
+                    if(wiseSayings.get(i).id == id) {
                         updateIndex = i;
                         break;
                     }
@@ -107,13 +104,13 @@ public class Main {
                 }
 
                 // 기존 데이터 출력 및 새 데이터 입력
-                WiseSaying wiseSaying = wiseSayings[updateIndex];
+                WiseSaying wiseSaying = wiseSayings.get(updateIndex);
                 System.out.println("기존 명언 : " + wiseSaying.content);
                 System.out.print("명언 : ");
                 String newContent = scanner.nextLine();
 
                 System.out.println("기존 작가 : " + wiseSaying.author);
-                System.out.print("작 : ");
+                System.out.print("작가 : ");
                 String newAuthor = scanner.nextLine();
 
                 // 데이터 변경
