@@ -7,15 +7,13 @@ import java.util.*;
 
 
 public class App {
-    private final Scanner scanner = new Scanner(System.in);
-
-
     public void run() {
 
         System.out.println("== 명언 앱 ==");
 
-        SystemController systemController = new SystemController();
-        WiseSayingController wiseSayingController = new WiseSayingController(scanner);
+        Scanner scanner = AppContext.scanner;
+        SystemController systemController = AppContext.systemController;
+        WiseSayingController wiseSayingController = AppContext.wiseSayingController;
 
         while(true) {
             System.out.print("명령) ");
