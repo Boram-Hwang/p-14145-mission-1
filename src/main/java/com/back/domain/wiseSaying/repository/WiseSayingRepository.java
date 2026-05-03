@@ -5,6 +5,7 @@ import com.back.WiseSaying;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class WiseSayingRepository {
     private final List<WiseSaying> wiseSayings = new ArrayList<>();
@@ -22,36 +23,26 @@ public class WiseSayingRepository {
     }
 
     public WiseSaying findById(int id) {
-        for(WiseSaying ws : wiseSayings) {
-            if(ws.getId() == id) return ws;
-        }
-        return null;
+        return wiseSayings.stream()
+                .filter(ws -> ws.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     private int findIndexById(int id) {
-        for(int i = 0; i<= wiseSayings.size(); i++) {
-            if(wiseSayings.get(i).getId() == id) {
-                return i;
-            }
-        }
-        return -1;
+        return IntStream.range(0, wiseSayings.size())
+                .filter(i -> wiseSayings.get(i).getId() == id)
+                .findFirst()
+                .orElse(-1);
     }
 
     public boolean deleteById(int id) {
-        int deleteIndex = -1;
-        // id가 같은 명언을 찾기
-        for(int i = 0; i <=wiseSayings.size() - 1; i++) {
-            if(wiseSayings.get(i).getId() == id) {
-                deleteIndex = i;
-                break;
-            }
-        }
+        int index = findIndexById(id);
 
-        if(deleteIndex != -1) {
-            // 삭제
-            wiseSayings.remove(deleteIndex);
-            return true;
-        }
-        return false;
+        if(index == -1) return false;
+
+        wiseSayings.remove(index);
+
+        return true;
     }
 }
