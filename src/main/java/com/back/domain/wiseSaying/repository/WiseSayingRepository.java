@@ -2,6 +2,7 @@ package com.back.domain.wiseSaying.repository;
 
 import com.back.WiseSaying;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,9 +17,16 @@ public class WiseSayingRepository {
     }
 
     public void save(WiseSaying wiseSaying) {
-        if (wiseSaying.getId() == 0) {
+        if (wiseSaying.isNew()) {
+            // 최초 저장 시
             wiseSaying.setId(++lastId);
+            LocalDateTime now = LocalDateTime.now();
+            wiseSaying.setCreateDate(now);
+            wiseSaying.setModifyDate(now);
             wiseSayings.add(wiseSaying);
+        } else {
+            // 수정
+            wiseSaying.setModifyDate(LocalDateTime.now());
         }
     }
 

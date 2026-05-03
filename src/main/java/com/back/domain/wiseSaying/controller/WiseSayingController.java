@@ -61,13 +61,20 @@ public class WiseSayingController {
     }
 
     public void actionList() {
-        System.out.println("번호 / 작가 / 명언");
-        System.out.println("-----------------");
+        System.out.println("번호 / 작성날짜 / 수정날짜 / 작가 / 명언");
+        System.out.println("-----------------------------");
 
         List<WiseSaying> forListWiseSayings = wiseSayingService.findForList();
 
         for(WiseSaying ws : forListWiseSayings) {
-            System.out.printf("%d / %s / %s\n", ws.getId(), ws.getAuthor(), ws.getContent());
+            System.out.printf(
+                    "%d / %s / %s / %s / %s\n",
+                    ws.getId(),
+                    ws.getCreateDate(),
+                    ws.getModifyDate(),
+                    ws.getAuthor(),
+                    ws.getContent()
+            );
         }
     }
 
