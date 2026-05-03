@@ -5,7 +5,7 @@ import java.util.*;
 
 public class App {
     private final Scanner scanner = new Scanner(System.in);
-    private List<WiseSaying> wiseSayings = new ArrayList<>();
+    private final List<WiseSaying> wiseSayings = new ArrayList<>();
     private int lastId = 0;
 
     public void run() {
@@ -15,33 +15,29 @@ public class App {
         while(true) {
             System.out.print("명령) ");
             String cmd = scanner.nextLine();
+            Rq rq = new Rq(cmd);
 
-            if(cmd.equals("종료")) {
-                break;
-            } else if (cmd.equals("등록")) {
-                actionWrite();
-            } else if (cmd.equals("목록")) {
-                actionList();
-            } else if (cmd.startsWith("삭제")) {
-                actionDelete(cmd);
-            } else if (cmd.startsWith("수정")) {
-                actionModify(cmd);
+            switch (rq.getActionName()) {
+                case "종료" -> {
+                    System.out.println("프로그램이 종료합니다.");
+                    return;
+                }
+                case "목록" -> actionList();
+                case "등록" -> actionWrite();
+                case "삭제" -> actionDelete(rq);
+                case "수정" -> actionModify(rq);
             }
         }
-
     }
 
-    private void actionModify(String cmd) {
-        String[] cmdBites = cmd.split("=", 2);
-//        int updateIndex = -1;
+    private void actionModify(Rq rq) {
+        int id = rq.getParamAsInt("id", -1);
 
         // 예외처리
-        if(cmdBites.length < 2 || cmdBites[1].isEmpty()) {
+        if(id == -1) {
             System.out.println("id를 입력해주세요.");
             return;
         }
-
-        int id = Integer.parseInt(cmdBites[1]);
 
         WiseSaying findWiseSaying = findById(id);
 
@@ -105,37 +101,30 @@ public class App {
         return Collections.unmodifiableList(wiseSayings.reversed());
     }
 
-    private void actionDelete(String cmd) {
-        String[] cmdBites = cmd.split("=", 2);
+    private void actionDelete(Rq rq) {
+        int id = rq.getParamAsInt("id", -1);
 
-        if (cmdBites.length < 2 || cmdBites[1].isEmpty()) {
+        if (id == -1) {
             System.out.println("id를 입력해주세요.");
             return;
         }
 
-        int id = Integer.parseInt(cmdBites[1]);
-
         // 존재 여부 확인
-        WiseSaying findWiseSaying = findById(id);
-
+        boolean deleted = delete(id);
         // 없을 경우
-        if(findWiseSaying == null) {
+        if(!deleted) {
             System.out.println("%d번 명언은 존재하지 않습니다.".formatted(id));
             return;
         }
-
-        // 삭제 로직 수행
-        delete(id);
         System.out.printf("%d번 명언이 삭제되었습니다.\n".formatted(id));
-
-        return;
     }
 
     // id 찾기
     private WiseSaying findById(int id) {
-        int index = findIndexById(id);
-
-        return wiseSayings.get(index);
+        for(WiseSaying ws : wiseSayings) {
+            if(ws.getId() == id) return ws;
+        }
+        return null;
     }
 
     private int findIndexById(int id) {
@@ -147,7 +136,7 @@ public class App {
         return -1;
     }
 
-    private void delete(int id) {
+    private boolean delete(int id) {
         int deleteIndex = -1;
         // id가 같은 명언을 찾기
         for(int i = 0; i <=wiseSayings.size() - 1; i++) {
@@ -160,6 +149,8 @@ public class App {
         if(deleteIndex != -1) {
             // 삭제
             wiseSayings.remove(deleteIndex);
+            return true;
         }
+        return false;
     }
 }
