@@ -2,6 +2,7 @@ package com.back.domain.wiseSaying.controller;
 
 import com.back.Rq;
 import com.back.WiseSaying;
+import com.back.domain.wiseSaying.service.WiseSayingService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,12 +10,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class WiseSayingController {
-    private final List<WiseSaying> wiseSayings = new ArrayList<>();
-    private int lastId = 0;
     private final Scanner scanner;
+    private final WiseSayingService wiseSayingService;
 
     public WiseSayingController(Scanner scanner) {
         this.scanner = scanner;
+        this.wiseSayingService = new WiseSayingService();
     }
 
     public void actionModify(Rq rq) {
@@ -26,7 +27,7 @@ public class WiseSayingController {
             return;
         }
 
-        WiseSaying findWiseSaying = findById(id);
+        WiseSaying findWiseSaying = wiseSayingService.findById(id);
 
         // id 찾기
         // 없을 경우
@@ -43,15 +44,10 @@ public class WiseSayingController {
         System.out.print("작가 : ");
         String newAuthor = scanner.nextLine();
 
-        update(findWiseSaying, newContent, newAuthor);
+        wiseSayingService.update(findWiseSaying, newContent, newAuthor);
         System.out.printf("%d번 명언이 수정되었습니다.\n", id);
     }
 
-    private void update(WiseSaying findWiseSaying, String newContent, String newAuthor) {
-        // 데이터 변경
-        findWiseSaying.setContent(newContent);
-        findWiseSaying.setAuthor(newAuthor);
-    }
 
     public void actionWrite() {
         System.out.print("명언 : ");
@@ -59,33 +55,20 @@ public class WiseSayingController {
         System.out.print("작가 : ");
         String author = scanner.nextLine();
 
-        WiseSaying wiseSaying = write(content, author);
+        WiseSaying wiseSaying = wiseSayingService.write(content, author);
 
         System.out.println("%d번 명언이 등록되었습니다.".formatted(wiseSaying.getId()));
-    }
-
-    private WiseSaying write(String content, String author) {
-        WiseSaying wiseSaying = new WiseSaying(++lastId, content, author);
-
-        wiseSayings.add(wiseSaying);
-
-        return wiseSaying;
     }
 
     public void actionList() {
         System.out.println("번호 / 작가 / 명언");
         System.out.println("-----------------");
 
-        List<WiseSaying> forListWiseSayings = findAllReverse();
+        List<WiseSaying> forListWiseSayings = wiseSayingService.findAllReverse();
 
         for(WiseSaying ws : forListWiseSayings) {
             System.out.printf("%d / %s / %s\n", ws.getId(), ws.getAuthor(), ws.getContent());
         }
-    }
-
-    // 역순
-    private List<WiseSaying> findAllReverse() {
-        return Collections.unmodifiableList(wiseSayings.reversed());
     }
 
     public void actionDelete(Rq rq) {
@@ -97,7 +80,7 @@ public class WiseSayingController {
         }
 
         // 존재 여부 확인
-        boolean deleted = delete(id);
+        boolean deleted = wiseSayingService.delete(id);
         // 없을 경우
         if(!deleted) {
             System.out.println("%d번 명언은 존재하지 않습니다.".formatted(id));
@@ -106,38 +89,4 @@ public class WiseSayingController {
         System.out.printf("%d번 명언이 삭제되었습니다.\n".formatted(id));
     }
 
-    // id 찾기
-    private WiseSaying findById(int id) {
-        for(WiseSaying ws : wiseSayings) {
-            if(ws.getId() == id) return ws;
-        }
-        return null;
-    }
-
-    private int findIndexById(int id) {
-        for(int i = 0; i<= wiseSayings.size(); i++) {
-            if(wiseSayings.get(i).getId() == id) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private boolean delete(int id) {
-        int deleteIndex = -1;
-        // id가 같은 명언을 찾기
-        for(int i = 0; i <=wiseSayings.size() - 1; i++) {
-            if(wiseSayings.get(i).getId() == id) {
-                deleteIndex = i;
-                break;
-            }
-        }
-
-        if(deleteIndex != -1) {
-            // 삭제
-            wiseSayings.remove(deleteIndex);
-            return true;
-        }
-        return false;
-    }
 }
